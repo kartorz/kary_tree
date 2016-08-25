@@ -11,6 +11,9 @@
 #define _KARY_TREE_HPP_
 
 #include "tree_node.hpp"
+#include "tree_node_1.hpp"
+#include "tree_node_2.hpp"
+#include <stdio.h>
 
 namespace ktree {
 template <typename T>
@@ -21,12 +24,22 @@ public:
     {
     }
 
-	kary_tree(const T& d)
+	kary_tree(const T& d, int type = 2)
 	{
-		_root = new tree_node<T>(d);
+        _root = newNode(d, type);
 	}
 
 	~kary_tree() { clear(); }
+
+    treeNodePtr newNode(const T& d, int type = 2)
+    {
+        treeNodePtr ret;
+        if (type == 1)
+            ret = new tree_node_1<T>(d);
+        else
+            ret = new tree_node_2<T>(d);
+        return ret;
+    }
 
 	treeNodePtr root() const { return _root; }
 
@@ -41,9 +54,10 @@ void erase(tree_node<T> *pTree)
 {
   pTree->clear();
   delete pTree;
+  pTree = NULL;
 }
 
-#ifdef WIN32
+#if 0
 template <typename T>
 void remove(tree_node<T> *pTree)
 {
@@ -63,6 +77,10 @@ void remove(tree_node<T> *pTree)
 template <typename T>
 void remove(tree_node<T> *pTree)
 {
+    tree_node<T> *p = pTree->parent();
+    if(p != NULL)
+        p->remove(pTree);
+
 	traverse(pTree, erase);
 }
 #endif
@@ -70,14 +88,14 @@ template <typename T>
 void traverse(tree_node<T> *pTree, void(*visit)(tree_node<T> *pTree))
 {
 	if(!pTree) return;
+    if (pTree->size() == 0) return;
 
-	if(!pTree->children().empty()) {
-		typename std::list<tree_node<T> *>::const_iterator iter;
-		const std::list<tree_node<T> *>& children = pTree->children();
-		for (iter = children.begin(); iter != children.end(); ++iter) {
-		     traverse(*iter, visit);
-		}
-	}
+    tree_node<T> *child = pTree->begin();
+    while (child != NULL) {
+        traverse(child, visit);
+        child = pTree->next();
+    }
+
 	visit(pTree);
 }
 

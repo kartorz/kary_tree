@@ -1,5 +1,5 @@
 /** 
- *	@Copyright 2013  AlphaDict
+ *	@Copyright 2013  kary_tree
  *	@Authors: LiQiong Lee
  *
  * Distributed under the GNU GENERAL PUBLIC LICENSE, version 3 (GPLv3)
@@ -11,6 +11,9 @@
  * use the k-ary tree.
  * 
  */
+
+// g++ -O0 -g -o test test.cpp -D_LINUX
+
 #include "kary_tree.hpp"
 
 #include <stdio.h>
@@ -65,4 +68,3 @@ int main(int argc, char* argv[])
 	printf("\n");
 }
 
-/** g++ -O0 -g -o test test.cpp **/

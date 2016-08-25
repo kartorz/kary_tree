@@ -13,23 +13,11 @@
 #include <list>
 #include <iterator>
 
-#ifdef _LINUX
-template<class ForwardIt>
-ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::difference_type n = 1)
-{
-    std::advance(it, n);
-    return it;
-}
-#endif
-
 namespace ktree {
-
-template <typename T> class tree_node;
-template <typename T> class kary_tree;
 
 template <typename T>
 class tree_node {
-	friend class kary_tree<T>;
+
 public:
 	typedef tree_node<T>*  	           treeNodePtr;
 	typedef const tree_node<T>*  const_treeNodePtr;
@@ -49,60 +37,26 @@ public:
 		_data = d;
 	}
 
-	std::list<treeNodePtr>& children()
-	{
-		return _children;
-	}
+    virtual int size() = 0;
 
-	treeNodePtr operator[](const int pos) const
-	{
-		return child(pos);
-	}
+	virtual treeNodePtr operator[](const int pos) const = 0;
 	
-	treeNodePtr child(const int pos) const
-	{
-		typename std::list<treeNodePtr>::const_iterator iter;
-    #ifdef WIN32
-        iter = std::next(_children.begin(), pos);
-    #else
-		iter = next(_children.begin(), pos);
-    #endif
-		return *iter;
-	}
+	virtual treeNodePtr child(const int pos) const = 0;
 	
-	treeNodePtr insert(const T& d, int pos=-1/*pos:begin(0);end(-1);*/)
- 	{
-		treeNodePtr pTree = new tree_node<T>(d);
-		if (pos == -1)
-			_children.push_back(pTree);
-		else if(pos == 0)
-			_children.push_front(pTree);
-		else {
-			typename std::list<treeNodePtr>::iterator iter;
-#ifdef WIN32
-			iter = std::next(_children.begin(), pos);
-#else
-            iter = next(_children.begin(), pos);
-#endif
-			_children.insert(iter, pTree);
-		}
-		pTree->_parent = this;
-		return pTree;
-	}
+	virtual treeNodePtr insert(const T& d, int pos=-1/*pos:begin(0);end(-1);*/) = 0;
 
-	void clear()
-	{
-        _children.clear();
-	}
+	virtual void clear() = 0;
 
-private:
-	tree_node(const T& d) : _data(d) {}
-	tree_node();
+    virtual treeNodePtr begin() = 0;
 
-	treeNodePtr  _parent;
+    virtual treeNodePtr next() = 0;
+    
+    virtual void remove(int pos) = 0;
+
+    virtual void remove(treeNodePtr pTree) = 0;
+
+	treeNodePtr  _parent = NULL;
     T _data;
-
-	std::list<treeNodePtr> _children;
 };
 
 };
