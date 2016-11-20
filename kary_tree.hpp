@@ -29,7 +29,7 @@ public:
         _root = newNode(d, type);
 	}
 
-	~kary_tree() { clear(); }
+	~kary_tree() { remove(_root); }
 
     treeNodePtr newNode(const T& d, int type = 2)
     {
@@ -43,7 +43,15 @@ public:
 
 	treeNodePtr root() const { return _root; }
 
-	void clear() const { remove(_root); }
+    // Keep _root
+	void clear() const {
+        tree_node<T> *child = _root->begin();
+        while (child != NULL) {
+            tree_node<T> *next = _root->next();
+            remove(child);
+            child = next;
+        }
+    }
 
 private:
 	treeNodePtr _root;
@@ -79,7 +87,7 @@ void remove(tree_node<T> *pTree)
 {
     tree_node<T> *p = pTree->parent();
     if(p != NULL)
-        p->remove(pTree);
+        p->remove(pTree); // Remove node from parent.
 
 	traverse(pTree, erase);
 }
@@ -92,8 +100,9 @@ void traverse(tree_node<T> *pTree, void(*visit)(tree_node<T> *pTree))
 
     tree_node<T> *child = pTree->begin();
     while (child != NULL) {
+        tree_node<T> *next = pTree->next();
         traverse(child, visit);
-        child = pTree->next();
+        child = next;
     }
 
 	visit(pTree);
